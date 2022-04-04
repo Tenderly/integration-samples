@@ -1,0 +1,90 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height:80vh;
+  font-size: 18px;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  monospace;
+}
+
+#container {
+  width: 80vh;
+  min-height: 160px;
+  position: relative;
+  -webkit-box-align: center;
+  -webkit-box-pack: center;
+  flex-direction: column;
+  text-align:left;
+  word-break: break-word;
+}
+
+input {
+  border-top-style: hidden;
+  border-right-style: hidden;
+  border-left-style: hidden;
+  border-bottom-style: groove;
+  font-size: 18px;
+  width: 90%;
+  border-color: rgba(3, 3, 3, 0.2);
+  line-height: 38px;
+}
+
+#status {
+  color:  #7d50ec;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+button {
+  padding: 9px 16px;
+  max-height: 40px;
+  *box-shadow: 4px 4px 15px 0 rgb(0 0 0 / 20%);
+  border-color:  #7d50ec ;
+  border: none;
+  background: none;
+  color:white;
+  background-color: #7d50ec;
+  border-radius: 6px;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  font-weight: bold;
+  cursor:pointer;
+  min-width: 160px;
+  margin-top: 70px;
+  font-family: Rubik, sans-serif;
+}
+
+#logo {
+  float:left;
+  display: flex;
+  margin-left: -10px;
+  margin-top: -16px;
+  width: 210px;
+}
+
+#walletButton {
+  padding: 7px 16px;
+  background-color: white;
+  float:right;
+  border: 2px solid #7d50ec ;
+  color:#7d50ec;
+  margin-top: 0px;
+}
+
+h2{
+  display: block;
+  clear:both;
+  font-weight:400;
+}
+
+a {
+  color:#7d50ec
+}
