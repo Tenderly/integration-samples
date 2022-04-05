@@ -29,4 +29,4 @@ jobs:
       - name: Run tests
         env:
           TENDERLY_FORK_ID: ${{ secrets.TenderlyForkID }}
-        run: yarn test
+        run: yarn test:ci

@@ -9,7 +9,8 @@
     "hardhat": "^2.9.2"
   },
   "scripts": {
-    "test": "npx hardhat test"
+    "test": "npx hardhat test",
+    "test:ci": "npx hardhat test --network tenderly-fork"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
