@@ -1,0 +1,29 @@
+name: Run tests in Tenderly Fork
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test hardhat-core on Ubuntu with Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [12, 14, 16]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+          cache: yarn
+      - name: Install
+        run: yarn --frozen-lockfile
+      - name: Build
+        run: yarn build
+      - name: Run tests
+        env:
+          TENDERLY_FORK_ID: ${{ secrets.TenderlyForkID }}
+        run: yarn test
