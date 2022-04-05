@@ -7,7 +7,8 @@ on:
     branches: [ main ]
 defaults:
   run:
-    working-directory: ./ci-cd-pipeline-for-smart-contracts/smart-contract-pipeline
+    shell: bash
+    working-directory: ci-cd-pipeline-for-smart-contracts/smart-contract-pipeline
 jobs:
   test:
     name: Test hardhat-core on Ubuntu with Node ${{ matrix.node }}
