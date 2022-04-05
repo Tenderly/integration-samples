@@ -20,12 +20,12 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
-          cache: yarn
-        working-directory: ./ci-cd-pipeline-for-smart-contracts/smart-contract-pipeline
+      - uses: actions/cache@v2
+          with:
+            path: '**/node_modules'
+            key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Install
-        run: yarn --frozen-lockfile
-      - name: Build
-        run: yarn build
+        run: yarn install
       - name: Run tests
         env:
           TENDERLY_FORK_ID: ${{ secrets.TenderlyForkID }}
