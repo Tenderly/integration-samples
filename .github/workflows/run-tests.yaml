@@ -14,16 +14,16 @@ jobs:
         working-directory: ./ci-cd-pipeline-for-smart-contracts/smart-contract-pipeline
     strategy:
       matrix:
-        node: [16]
+        node: [ 16 ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
       - uses: actions/cache@v2
-          with:
-            path: '**/node_modules'
-            key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Install
         run: yarn install
       - name: Run tests
