@@ -28,5 +28,5 @@ jobs:
         run: yarn install
       - name: Run tests
         env:
-          TENDERLY_FORK_ID: ${{ secrets.TenderlyForkID }}
+          TENDERLY_FORK_ID: ${{ secrets.TENDERLY_FORK_ID }}
         run: yarn test:ci

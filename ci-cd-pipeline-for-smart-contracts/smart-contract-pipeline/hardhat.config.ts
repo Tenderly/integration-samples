@@ -1,6 +1,7 @@
 import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-waffle";
-import "@tenderly/hardhat-tenderly"
+import "@tenderly/hardhat-tenderly";
+import 'dotenv/config';
 
 const {
     TENDERLY_FORK_ID
