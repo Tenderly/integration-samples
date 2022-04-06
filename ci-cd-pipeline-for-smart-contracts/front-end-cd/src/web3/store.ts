@@ -2,16 +2,27 @@ import {ethers, BigNumber, Signer} from "ethers"
 import {sendTransaction} from "./tenderly"
 
 const {
-    REACT_APP_TENDERLY_FORK_ID
+    REACT_APP_ENV,
+    REACT_APP_TENDERLY_FORK_ID,
 } = process.env
 
 const contractABI = require("./abi.json");
 const contractAddress = "0xf35101b37928bb044ff5339bc6ff816b68bd5c43";
 
-const provider = new ethers.providers.JsonRpcProvider(`https://rpc.tenderly.co/fork/${REACT_APP_TENDERLY_FORK_ID}`);
+const tenderlyForkProvider = new ethers.providers.JsonRpcProvider(`https://rpc.tenderly.co/fork/${REACT_APP_TENDERLY_FORK_ID}`);
 const metamaskSigner = (new ethers.providers.Web3Provider(window.ethereum)).getSigner()
 
-export const storeContract = new ethers.Contract(contractAddress, contractABI, provider)
+var provider: any = metamaskSigner
+var storeContract = new ethers.Contract(contractAddress, contractABI, metamaskSigner)
+
+export const setupEnv = () => {
+    if (REACT_APP_ENV != 'staging') {
+        return
+    }
+
+    storeContract = new ethers.Contract(contractAddress, contractABI, tenderlyForkProvider)
+    provider = tenderlyForkProvider
+}
 
 export const getValue = async () => {
   const value = await storeContract.retrieve();

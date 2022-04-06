@@ -1,9 +1,4 @@
 import {ethers, providers, Signer} from "ethers"
-import axios from "axios"
-
-const {
-    REACT_APP_TENDERLY_ACCESS_KEY,
-} = process.env
 
 export const sendTransaction = async (provider: any, sender: string, contract: any, funcName: string, ...args: any[]) => {
     if (provider instanceof providers.JsonRpcProvider) {
@@ -36,30 +31,4 @@ export const sendTransaction = async (provider: any, sender: string, contract: a
             console.log(err)
         }
     }
-}
-
-export const simulateTransaction = async (senderAddr: string, contract: any, funcName: string, ...args: any[]) => {
-    const unsignedTx = await contract.populateTransaction[funcName](...args)
-
-    const apiURL = `https://api.tenderly.co/api/v1/account/me/project/project/simulate`
-    const body = {
-        "network_id": "1",
-        "from": senderAddr,
-        "to": contract.address,
-        "input": unsignedTx.data,
-        "gas": 21204,
-        "gas_price": "0",
-        "value": 0,
-    	"save_if_fails": true
-    }
-
-    const headers = {
-        headers: {
-            'content-type': 'application/JSON',
-            'X-Access-Key': REACT_APP_TENDERLY_ACCESS_KEY as string,
-      }
-    }
-    const resp = await axios.post(apiURL, body, headers);
-
-    return resp
 }

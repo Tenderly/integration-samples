@@ -1,7 +1,9 @@
 import {ethers, BigNumber, Signer} from "ethers"
 import {sendTransaction} from "./tenderly"
 
-const REACT_APP_TENDERLY_FORK_ID="redacted"
+const {
+    REACT_APP_TENDERLY_FORK_ID
+} = process.env
 
 const contractABI = require("./abi.json");
 const contractAddress = "0xf35101b37928bb044ff5339bc6ff816b68bd5c43";

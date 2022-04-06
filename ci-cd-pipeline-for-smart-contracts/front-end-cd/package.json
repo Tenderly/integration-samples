@@ -1,5 +1,5 @@
 {
-  "name": "playround-enviroment-for-dapps",
+  "name": "front-end-pipeline",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -22,7 +22,8 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build"
+    "build": "react-app-rewired build",
+    "build:cd": "react-app-rewired build"
   },
   "eslintConfig": {
     "extends": [

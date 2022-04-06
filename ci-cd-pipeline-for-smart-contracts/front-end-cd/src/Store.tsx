@@ -2,6 +2,7 @@ import React from "react";
 import "./Store.css"
 import { useEffect, useState } from "react";
 import {
+  setupEnv,
   store,
   connectWallet,
   getValue,
@@ -26,6 +27,7 @@ const Store = () => {
   }
 
   useEffect(() => {
+    setupEnv()
     fetch()
   }, []);
 
@@ -52,7 +54,7 @@ const Store = () => {
       const {status} = await store(walletAddress, amount);
       setStatus(status);
 
-      await fetch()
+      fetch()
     }
 
     execute()

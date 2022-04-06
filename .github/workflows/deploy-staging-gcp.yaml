@@ -1,0 +1,38 @@
+name: PR Staging environment
+on:
+  pull_request:
+    branches: [ master ]
+env:
+  GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./ci-cd-pipeline-for-smart-contracts/front-end-pipeline
+    strategy:
+      matrix:
+        node: [ 16 ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Setup - gcloud / gsutil
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          service_account_key: ${{ secrets.GCS_SA_KEY }}
+          project_id: ${{ secrets.GCS_PROJECT }}
+          export_default_credentials: true
+      - name: Build React App
+        run: npm install && npm run build:cd
+        env:
+          TENDERLY_FORK_URL: ${{ secrets.TENDERLY_FORK_URL }}
+          REACT_APP_ENV: staging
+      - name: Deploy app build to GCS bucket
+        run: |-
+          gsutil -m rsync -R output gs://$GCS_BUCKET/${{github.job}}_${{github.run_id}}

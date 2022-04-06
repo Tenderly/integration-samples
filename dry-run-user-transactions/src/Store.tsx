@@ -37,14 +37,14 @@ const Store = () => {
         if (accounts.length > 0) {
           // @ts-ignore
           setWallet(accounts[0]);
-          setStatus("👆🏽 Write a message in the text-field above.");
+          setStatus("Write a value you wish to store in the text-field above.");
         } else {
           setWallet("");
-          setStatus("🦊 Connect to Metamask using the top right button.");
+          setStatus("Connect to Metamask using the top right button.");
         }
       });
     } else {
-      setStatus("🦊 You must install Metamask.");
+      setStatus("You must install Metamask.");
     }
   }
 
