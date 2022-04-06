@@ -1,7 +1,10 @@
 name: PR Staging environment
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
+  # temp for testing
+  push:
+    branches: [ main ]
 env:
   GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
 jobs:
