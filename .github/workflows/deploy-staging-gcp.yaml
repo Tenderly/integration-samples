@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./ci-cd-pipeline-for-smart-contracts/front-end-pipeline
+        working-directory: ./ci-cd-pipeline-for-smart-contracts/front-end-cd
     strategy:
       matrix:
         node: [ 16 ]
