@@ -28,7 +28,7 @@ const Store = () => {
 
   useEffect(() => {
     setupEnv()
-    fetch()
+    fetch().then()
   }, []);
 
   function addWalletListener() {

@@ -32,7 +32,7 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v0'
       - name: Build React App
-        run: npm install && npm run build:cd
+        run: yarn install && yarn run build:cd
         env:
           TENDERLY_FORK_URL: ${{ secrets.TENDERLY_FORK_URL }}
           REACT_APP_ENV: staging

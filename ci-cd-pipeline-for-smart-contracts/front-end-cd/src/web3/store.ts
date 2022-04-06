@@ -1,4 +1,4 @@
-import {ethers, BigNumber, Signer} from "ethers"
+import {ethers, BigNumber} from "ethers"
 import {sendTransaction} from "./tenderly"
 
 const {
@@ -16,7 +16,7 @@ var provider: any = metamaskSigner
 var storeContract = new ethers.Contract(contractAddress, contractABI, metamaskSigner)
 
 export const setupEnv = () => {
-    if (REACT_APP_ENV != 'staging') {
+    if (REACT_APP_ENV !== 'staging') {
         return
     }
 
@@ -99,7 +99,7 @@ export const store = async (ownerAddress: string, value: string) => {
 
 
   try {
-    const txHash = await sendTransaction(provider, ownerAddress, storeContract, "store", +value)
+    await sendTransaction(provider, ownerAddress, storeContract, "store", +value)
     return {
       status: "success"
     };
