@@ -15,7 +15,7 @@ const Store = () => {
   const [value, setValue] = useState(""); //default message
   const [amount, setAmount] = useState("");
 
-  async function fetch() {
+  async function fetchValue() {
     const {address, status} = await getConnectedWallet();
     const value = await getValue();
 
@@ -27,8 +27,19 @@ const Store = () => {
   }
 
   useEffect(() => {
+    async function fetch() {
+      const {address, status} = await getConnectedWallet();
+      const value = await getValue();
+
+      setWallet(address);
+      setStatus(status);
+      setValue(value);
+
+      addWalletListener();
+    }
+
     setupEnv()
-    fetch().then()
+    fetch()
   }, []);
 
   function addWalletListener() {
@@ -54,7 +65,7 @@ const Store = () => {
       const {status} = await store(walletAddress, amount);
       setStatus(status);
 
-      fetch()
+      await fetchValue()
     }
 
     execute()
