@@ -1,5 +1,5 @@
 {
-  "name": "playround-enviroment-for-dapps",
+  "name": "dry-run-transactions",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
