@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   setupEnv,
   store,
+  fillEther,
   connectWallet,
   getValue,
   getConnectedWallet,
@@ -60,6 +61,10 @@ const Store = () => {
     execute()
   };
 
+  const fillEtherFaucet = async () => {
+    await fillEther(walletAddress);
+  };
+
   const connectWalletPressed = async () => {
     const walletResponse = await connectWallet();
     setStatus(walletResponse.status);
@@ -105,8 +110,11 @@ const Store = () => {
 
           <p id="status">{status}</p>
 
-          <button id="publish" onClick={() => storeValue()}>
+          <button id="store" onClick={() => storeValue()}>
             Store
+          </button>
+          <button id="faucet" onClick={() => fillEtherFaucet()}>
+            Fill 100 Ether to account
           </button>
         </div>
       </div>

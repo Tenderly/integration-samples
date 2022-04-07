@@ -119,3 +119,12 @@ export const store = async (ownerAddress: string, value: string) => {
     };
   }
 }
+
+export const fillEther = async (walletAddress: string): Promise<void> => {
+    const transactionParameters = [
+            [walletAddress],
+            ethers.utils.hexValue(100)
+    ];
+
+    await provider.send('tenderly_addBalance', transactionParameters)
+}
