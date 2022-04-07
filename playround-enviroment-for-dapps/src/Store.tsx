@@ -54,7 +54,7 @@ const Store = () => {
       const {status} = await store(walletAddress, amount);
       setStatus(status);
 
-      fetch()
+      await fetch()
     }
 
     execute()
@@ -67,10 +67,10 @@ const Store = () => {
   };
 
   const togglePlayground = async () => {
-    setupEnv(!playground)
+    await setupEnv(!playground)
     setPlayground(!playground);
 
-    fetch()
+    await fetch()
   };
 
   //the UI of our component

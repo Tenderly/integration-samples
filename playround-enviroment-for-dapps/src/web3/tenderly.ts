@@ -1,4 +1,5 @@
 import {ethers, providers, Signer} from "ethers"
+import axios from "axios"
 
 export const sendTransaction = async (provider: any, sender: string, contract: any, funcName: string, ...args: any[]) => {
     if (provider instanceof providers.JsonRpcProvider) {
@@ -31,4 +32,32 @@ export const sendTransaction = async (provider: any, sender: string, contract: a
             console.log(err)
         }
     }
+}
+
+export const createFork = async (networkId: string, blockNumber: number, projectSlug: string, accessKey: string): Promise<string> => {
+    const TENDERLY_FORK_API = `http://api.tenderly.co/api/v1/account/me/project/${projectSlug}/fork`;
+    const opts = {
+        headers: {
+            'X-Access-Key': accessKey,
+        }
+    }
+    const body = {
+      "network_id": networkId,
+      "block_number": blockNumber,
+    }
+
+    const resp = await axios.post(TENDERLY_FORK_API, body, opts);
+    return resp.data.simulation_fork.id
+}
+
+export const deleteFork = async(forkId: string, projectSlug: string, accessKey: string): Promise<void> => {
+    const TENDERLY_FORK_API = `http://api.tenderly.co/api/v1/account/me/project/${projectSlug}/fork/${forkId}`;
+    const opts = {
+        headers: {
+            'X-Access-Key': accessKey,
+        }
+    }
+
+    await axios.delete(TENDERLY_FORK_API, opts);
+    return
 }

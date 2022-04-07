@@ -1,33 +1,41 @@
 import {ethers, BigNumber, Signer} from "ethers"
-import {sendTransaction} from "./tenderly"
+import {sendTransaction, createFork, deleteFork} from "./tenderly"
 
 const {
-    REACT_APP_TENDERLY_FORK_ID
+    REACT_APP_ACCESS_KEY
 } = process.env
 
 const contractABI = require("./abi.json");
 const contractAddress = "0xf35101b37928bb044ff5339bc6ff816b68bd5c43";
 
-const tenderlyForkProvider = new ethers.providers.JsonRpcProvider(`https://rpc.tenderly.co/fork/${REACT_APP_TENDERLY_FORK_ID}`);
 const metamaskSigner = (new ethers.providers.Web3Provider(window.ethereum)).getSigner()
 
+var forkId = ""
 var provider: any = metamaskSigner
 var storeContract = new ethers.Contract(contractAddress, contractABI, metamaskSigner)
 
-export const setupEnv = (playground: boolean) => {
+export const setupEnv = async (playground: boolean) => {
     if (playground) {
+        forkId = await createFork("3", 12167348, "project", REACT_APP_ACCESS_KEY as string)
+        const tenderlyForkProvider = new ethers.providers.JsonRpcProvider(`https://rpc.tenderly.co/fork/${forkId}`);
+
         storeContract = new ethers.Contract(contractAddress, contractABI, tenderlyForkProvider)
         provider = tenderlyForkProvider
+
         return
+    }
+    if (!playground) {
+        await deleteFork(forkId, "project", REACT_APP_ACCESS_KEY as string)
+
+        forkId = ""
     }
 
     storeContract = new ethers.Contract(contractAddress, contractABI, metamaskSigner)
     provider = metamaskSigner
 }
 
-export const getValue = async () => {
+export async function getValue() {
   const value = await storeContract.retrieve();
-
   const bn = BigNumber.from(value)
   return bn.toString();
 };
