@@ -24,8 +24,13 @@ const ON_CHAIN = {
     VERIFIED_CONTRACT_ADDRESS: '0x5af444341e9cff8046a3789ff42c3ddcb737ca2b',
     NETWORK_ID: '3'
 }
+const ON_CHAIN_2 = {
+    VERIFIED_CONTRACT_ADDRESS: '0x85063cf82504381db12a2e42009a9ae2060098b5',
+    NETWORK_ID: '3'
+}
 
-const { VERIFIED_CONTRACT_ADDRESS, NETWORK_ID } = ON_CHAIN;
+
+const { VERIFIED_CONTRACT_ADDRESS, NETWORK_ID } = ON_CHAIN_2;
 // const { VERIFIED_CONTRACT_ADDRESS, NETWORK_ID } = CODE_FORKED;
 const { TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_KEY } = process.env;
 
@@ -86,16 +91,16 @@ const assignments = (assignment: TemplateStringsArray): string => {
     console.log(assignment);
     return ""
 }
-assignments`kvStore[1] = 99`;
+// assignments`kvStore[1] = 99`;
 
-console.log(t)
+// console.log(t)
 
 describe("State Overrides", async function () {
     before(async () => {
         // await forkAndDeployFooKvStorage();
     })
 
-    it("SSO of mapping are applied like so", async () => {
+    it.skip("SSO of mappings from primitives are applied like so", async () => {
         const axiosOptions = {
             headers: {
                 'X-Access-Key': TENDERLY_ACCESS_KEY || "",
@@ -105,55 +110,48 @@ describe("State Overrides", async function () {
         const ifc = new ethers.utils.Interface(contractAbi);
         const deployedContract = new ethers.Contract(VERIFIED_CONTRACT_ADDRESS, ifc);
 
-        // 1: prepare state overrides. 
+        // 1: prepare state overrides. This is where you specify all the contracts you need to override for the simulation.
         const stateOverridesSpecification = {
-            networkID: `${NETWORK_ID}`, // a STRING: network ID as "3" or forkID if the contract is deployed on a fork (ID in Tenderly Dashboard)
-            /* stateOverrides is specification of assignments, mapping Map<ContractAddress, AssignmentsSpecification>
-                - The key is the contract's address (so you can override state in as many contracts as you need to so it's all set for the transaction)
-                - The value is an object specifying assignment to state variables in simulation's override process.
-                It's a Map<LeftHandSide, RightHandSide>.
+            networkID: `${NETWORK_ID}`, // a STRING: network ID as "3"
+            /* stateOverrides is a specification of assignments: Map<ContractAddress, AssignmentsSpecification>
+                - The key is the contract's address (so you can override state in multiple contracts)
+                - The value is an object specifying overrides of state variables' values.
+                    It's a Map<LeftHandSide, RightHandSide>.
                   To assign a value in solidity: kvStore[1] = 99. To get an equivalent override add "kvStore[1]": "99" to value.
-                  Left hand side is the key ("kvStore[1]") and right hand side of the assignment is the value ("99").
-                
-                stateOverrides -> {
-                    contractAddress -> value: {
-                        contractStateVariable: primitiveValueToAssign
-                    }
-                }
+                  Left hand side is the key in this JSON ("kvStore[1]") and right hand side of the assignment is the value ("99").
             */
             stateOverrides: {
                 [VERIFIED_CONTRACT_ADDRESS]: {
                     value: {
                         // overrides of contract state override (fields come from contract's state vars)
-                        "kvStore[1]": "99"
+                        "kvStore[1]": "99",
+                        "nr": "1",
                     }
                 }
             }
         }
 
-        console.log(JSON.stringify(stateOverridesSpecification))
-
-        // 2: Encode state overrides
-        /* Encode the state variables which are sent within transaction simulation request */
-        // const `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/contracts/encode-states`
-        const ENCODE_STATE_API = `https://api.tenderly.co/api/v1/account/nenad/project/test-on-fork/contracts/encode-states`;
+        // 2: Encode state overrides (intermediary step)
+        const ENCODE_STATE_API = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/contracts/encode-states`;
         const encodedSatateResponse = await axios.post(ENCODE_STATE_API, stateOverridesSpecification, axiosOptions);
         const encodedStateOverrides = encodedSatateResponse.data;
 
-        console.log("ESO", JSON.stringify(encodedStateOverrides));
-        // contract function to invoke:
-
-        const unsignedTransactionToSimulate = await deployedContract.populateTransaction.keyValueStoreGet(1);
+        // 3: Prepare transaction
+        const unsignedTransactionToSimulate = await deployedContract.populateTransaction.kvStore(1);
         console.log(unsignedTransactionToSimulate)
 
-        // 3: Create a transaction with state_objects
-        const transaction = {
+        // 4: Create a transaction and pass encodedStateOverrides under state_objects
+        const transactionWithOverrides = {
             ...unsignedTransactionToSimulate, // 
             input: unsignedTransactionToSimulate.data, // input is necessary
             network_id: `${NETWORK_ID}`, //network ID: a string
             "from": "0x0000000000000000000000000000000000000000", // any address
             to: VERIFIED_CONTRACT_ADDRESS,
-            // use encodedStateOverrides to populate the override values
+
+            /* 
+                This is again a mapping; Map<ContractAddress, {storage: encodedStorageOverrides }> 
+                populate storage with the value in encodedStateOverrides which corresponds  
+            */
             state_objects: {
                 [VERIFIED_CONTRACT_ADDRESS]: {
                     storage: encodedStateOverrides.stateOverrides[VERIFIED_CONTRACT_ADDRESS].value
@@ -161,14 +159,84 @@ describe("State Overrides", async function () {
             },
             save: true // saves to dashboard
         }
-        console.log(JSON.stringify(transaction));
+        console.log(JSON.stringify(transactionWithOverrides));
 
         const SIMULATE_API = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/simulate`
 
-        const simResponse = await axios.post(SIMULATE_API, transaction, axiosOptions);
+        const simResponse = await axios.post(SIMULATE_API, transactionWithOverrides, axiosOptions);
+        console.log("Returned value: ", simResponse.data.transaction.transaction_info.call_trace.output);
 
-        console.log(JSON.stringify(simResponse.data.transaction))
     });
+
+    it("SSO_ADDR of mappings from address are applied like so", async () => {
+        const axiosOptions = {
+            headers: {
+                'X-Access-Key': TENDERLY_ACCESS_KEY || "",
+            }
+        }
+
+        const ifc = new ethers.utils.Interface(contractAbi);
+        const deployedContract = new ethers.Contract(VERIFIED_CONTRACT_ADDRESS, ifc);
+
+        // 1: prepare state overrides. This is where you specify all the contracts you need to override for the simulation.
+        const stateOverridesSpecification = {
+            networkID: `${NETWORK_ID}`, // a STRING: network ID as "3"
+            /* stateOverrides is a specification of assignments: Map<ContractAddress, AssignmentsSpecification>
+                - The key is the contract's address (so you can override state in multiple contracts)
+                - The value is an object specifying overrides of state variables' values.
+                    It's a Map<LeftHandSide, RightHandSide>.
+                  To assign a value in solidity: kvStore[1] = 99. To get an equivalent override add "kvStore[1]": "99" to value.
+                  Left hand side is the key in this JSON ("kvStore[1]") and right hand side of the assignment is the value ("99").
+            */
+            stateOverrides: {
+                [VERIFIED_CONTRACT_ADDRESS]: {
+                    value: {
+                        // overrides of contract state override (fields come from contract's state vars)
+                        "addrMap[0x0ff132c3661dcbccdfed6f810c1d1c54e71715e0]": "99",
+                        "nr": "1",
+                    }
+                }
+            }
+        }
+        console.log(stateOverridesSpecification);
+
+        // 2: Encode state overrides (intermediary step)
+        const ENCODE_STATE_API = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/contracts/encode-states`;
+        const encodedSatateResponse = await axios.post(ENCODE_STATE_API, stateOverridesSpecification, axiosOptions);
+        const encodedStateOverrides = encodedSatateResponse.data;
+
+        // 3: Prepare transaction
+        const unsignedTransactionToSimulate = await deployedContract.populateTransaction.addrMap("0x0ff132c3661dcbccdfed6f810c1d1c54e71715e0");
+        console.log(unsignedTransactionToSimulate)
+
+        // 4: Create a transaction and pass encodedStateOverrides under state_objects
+        const transactionWithOverrides = {
+            ...unsignedTransactionToSimulate, // 
+            input: unsignedTransactionToSimulate.data, // input is necessary
+            network_id: `${NETWORK_ID}`, //network ID: a string
+            "from": "0x0000000000000000000000000000000000000000", // any address
+            to: VERIFIED_CONTRACT_ADDRESS,
+
+            /* 
+                This is again a mapping; Map<ContractAddress, {storage: encodedStorageOverrides }> 
+                populate storage with the value in encodedStateOverrides which corresponds  
+            */
+            state_objects: {
+                [VERIFIED_CONTRACT_ADDRESS]: {
+                    storage: encodedStateOverrides.stateOverrides[VERIFIED_CONTRACT_ADDRESS].value
+                }
+            },
+            save: true // saves to dashboard
+        }
+        console.log(JSON.stringify(transactionWithOverrides));
+
+        const SIMULATE_API = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/simulate`
+
+        const simResponse = await axios.post(SIMULATE_API, transactionWithOverrides, axiosOptions);
+        console.log("Returned value: ", simResponse.data.transaction.transaction_info.call_trace.output);
+
+    });
+
     it.skip("OV_API", async () => {
         anAxiosOnTenderly().post(
             `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/fork/${NETWORK_ID}/simulate`,
@@ -201,3 +269,4 @@ describe("State Overrides", async function () {
         )
     })
 });
+
