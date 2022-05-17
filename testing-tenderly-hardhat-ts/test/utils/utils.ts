@@ -17,3 +17,18 @@ export const forkAndDeployGreeter = async () => {
 
     return { fork, greeter }
 }
+
+export const forkAndDeployFooKvStorage = async () => {
+    const fork = await forkForTest({ network_id: "1" });
+
+    // deploy the contract
+    const FooStorage = await ethers.getContractFactory(
+        "FooStorage",
+        fork.provider.getSigner()
+    );
+    const fooStorage = await FooStorage.deploy();
+
+    const deployConfirmation = await fooStorage.deployed();
+
+    return { fork, greeter: fooStorage }
+}
