@@ -7,7 +7,7 @@ import { anAxiosOnTenderly, forkForTest } from "./utils/tenderly/fork";
 import { forkAndDeployGreeter } from "./utils/utils";
 
 describe("Custom JSON-RPC calls", async () => {
-  it("Adds Balance", async () => {
+  it("Adds Balance to an address on a fork of a network using tenderly_setBalance", async () => {
     const { fork } = await forkAndDeployGreeter();
     const provider = fork.provider;
     // TO DOCS:
@@ -36,7 +36,7 @@ describe("Custom JSON-RPC calls", async () => {
     expect(newBalances[1].balance).to.eq("0x80");
   });
 
-  it("Sets Balance", async () => {
+  it("Sets Balance of an address on a fork of a network using tenderly_setBalance", async () => {
     const { fork } = await forkAndDeployGreeter();
     const provider = fork.provider;
     // TO DOCS:
@@ -63,7 +63,7 @@ describe("Custom JSON-RPC calls", async () => {
     expect(newBalances[1].balance).to.eq("0x64");
   });
 
-  it("evm-inc-time increases the time on the fork of the chain", async () => {
+  it("Increases the time in seconds on the fork of the chain using evm_increaseTime", async () => {
     const { fork, greeter } = await forkAndDeployGreeter();
     const originalTimestamp = (
       await fork.provider.getBlock(await fork.provider.getBlockNumber())
@@ -80,7 +80,7 @@ describe("Custom JSON-RPC calls", async () => {
     expect(newTimeStamp).gte(originalTimestamp + 24 * 60 * 60);
   });
 
-  it("evm-inc-block increases the number of blocks on the fork of the chain", async () => {
+  it("Increases the number of blocks on the fork of the chain using evm_inc_block", async () => {
     const providerOnTenderlyFork = (
       await forkForTest({ network_id: "1", block_number: 14386016 })
     ).provider;
@@ -104,7 +104,7 @@ describe("Custom JSON-RPC calls", async () => {
     expect(newBlockNumber).to.eq(originalBlockNumber + 5 + 1);
   });
 
-  it("fork and add balance to account", async () => {
+  it("Sets balance of an arbitrary address on a fork of a network using tenderly_addBalance", async () => {
     const {
       TENDERLY_USER,
       TENDERLY_PROJECT,
@@ -141,7 +141,7 @@ describe("Custom JSON-RPC calls", async () => {
     expect(addBalance).is.not.empty;
   });
 
-  it("Set-storage at particular slot", async () => {
+  it("Sets storage to desired value using at particular slot using tenderly_setStorageAt", async () => {
     const { fork, greeter } = await forkAndDeployGreeter();
 
     const storageNrAddress = ethers.utils.solidityKeccak256(["uint256"], ["2"]);
@@ -153,7 +153,7 @@ describe("Custom JSON-RPC calls", async () => {
     await fork.provider.send("tenderly_setStorageAt", [
       // the contract address
       greeter.address,
-      storageNrAddress,
+      "0x0000000000000000000000000000000000000000000000000000000000000002",
       "0x0000000000000000000000000000000000000000000000000000000000000055",
     ]);
 
