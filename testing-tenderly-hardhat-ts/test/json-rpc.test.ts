@@ -144,21 +144,16 @@ describe("Custom JSON-RPC calls", async () => {
   it("Sets storage to desired value using at particular slot using tenderly_setStorageAt", async () => {
     const { fork, greeter } = await forkAndDeployGreeter();
 
-    const storageNrAddress = ethers.utils.solidityKeccak256(["uint256"], ["2"]);
-    // const k = ethers.utils.keccak256(
-    //   "0x0000000000000000000000000000000000000000000000000000000000000002"
-    // );
-
-    console.log("ST", storageNrAddress);
+    const two32B = ethers.utils.hexZeroPad(ethers.utils.hexValue(2), 32);
+    const fiftyFive32B = ethers.utils.hexZeroPad(ethers.utils.hexValue(55), 32);
     await fork.provider.send("tenderly_setStorageAt", [
       // the contract address
       greeter.address,
-      storageNrAddress,
-      "0x0000000000000000000000000000000000000000000000000000000000000055",
+      two32B,
+      fiftyFive32B,
     ]);
 
-    expect(await ethers.provider.getStorageAt(greeter.address, 2)).eq(
-      "0x0000000000000000000000000000000000000000000000000000000000000055"
-    );
+    const newValue = await fork.provider.getStorageAt(greeter.address, 2);
+    expect(newValue).eq(fiftyFive32B.toString());
   });
 });

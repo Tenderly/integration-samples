@@ -29,7 +29,9 @@ describe("Direct usage of Tenderly fork API ", function () {
       `https://rpc.tenderly.co/fork/${forkId}`
     );
     provider.getSigner();
-    console.info("Forked with fork id:", forkId);
+    console.info(
+      `\nForked with fork id ${forkId}\nhttps://dashboard.tenderly.co/${process.env.TENDERLY_USER}/${process.env.TENDERLY_PROJECT}/fork/${forkId}\n`
+    );
 
     // - deploy smart contract
     const Greeter = await ethers.getContractFactory(
@@ -83,7 +85,9 @@ describe("Direct usage of Tenderly fork API ", function () {
     const provider = new JsonRpcProvider(
       `https://rpc.tenderly.co/fork/${forkId}`
     );
-    console.info("Forked with fork id:", forkId);
+    console.info(
+      `\nForked with fork id ${forkId}\nhttps://dashboard.tenderly.co/${process.env.TENDERLY_USER}/${process.env.TENDERLY_PROJECT}/fork/${forkId}\n`
+    );
 
     // - deploy smart contract
     const Greeter = await ethers.getContractFactory(

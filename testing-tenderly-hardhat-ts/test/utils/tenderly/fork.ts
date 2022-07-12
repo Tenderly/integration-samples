@@ -66,7 +66,7 @@ export async function forkForTest(
   const blockNumber: number = Number.parseInt(bn, 16);
 
   console.info(
-    `Forked with fork id ${forkId} at block number ${blockNumber}\nhttps://dashboard.tenderly.co/${process.env.TENDERLY_USER}/${process.env.TENDERLY_PROJECT}/fork/${forkId}`
+    `\nForked with fork id ${forkId} at block number ${blockNumber}\nhttps://dashboard.tenderly.co/${process.env.TENDERLY_USER}/${process.env.TENDERLY_PROJECT}/fork/${forkId}\n`
   );
 
   const accounts = forkResponse.data.simulation_fork.accounts;
