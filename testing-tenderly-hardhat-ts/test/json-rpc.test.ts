@@ -153,7 +153,7 @@ describe("Custom JSON-RPC calls", async () => {
     await fork.provider.send("tenderly_setStorageAt", [
       // the contract address
       greeter.address,
-      "0x0000000000000000000000000000000000000000000000000000000000000002",
+      storageNrAddress,
       "0x0000000000000000000000000000000000000000000000000000000000000055",
     ]);
 
