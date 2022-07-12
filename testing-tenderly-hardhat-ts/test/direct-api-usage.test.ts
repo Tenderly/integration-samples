@@ -18,12 +18,18 @@ describe("Direct usage of Tenderly fork API ", function () {
 
     const forkingPoint = { network_id: "1", block_number: 14386016 };
     // create the specified fork
-    const forkResponse = await axiosOnTenderly.post(`${projectUrl}/fork`, forkingPoint);
+    const forkResponse = await axiosOnTenderly.post(
+      `${projectUrl}/fork`,
+      forkingPoint
+    );
     const forkId = forkResponse.data.root_transaction.fork_id;
 
     // create the provider you can use throughout the rest of your test
-    const provider = new JsonRpcProvider(`https://rpc.tenderly.co/fork/${forkId}`);
-    console.info("Forked with fork id:", forkId)
+    const provider = new JsonRpcProvider(
+      `https://rpc.tenderly.co/fork/${forkId}`
+    );
+    provider.getSigner();
+    console.info("Forked with fork id:", forkId);
 
     // - deploy smart contract
     const Greeter = await ethers.getContractFactory(
@@ -33,21 +39,19 @@ describe("Direct usage of Tenderly fork API ", function () {
     const greeter = await Greeter.deploy("Hello, world!");
     await greeter.deployed();
 
-
     // - assert stuff
     expect(await greeter.greet()).to.be.equal("Hello, world!");
     await (await greeter.setGreeting("Hola, mundo!")).wait();
     expect(await greeter.greet()).to.be.equal("Hola, mundo!");
 
-
     // - sign transactions with a specific signer
-    const testAddresses = Object.keys(forkResponse.data.simulation_fork.accounts);
+    const testAddresses = Object.keys(
+      forkResponse.data.simulation_fork.accounts
+    );
     const anotherSigner = provider.getSigner(testAddresses[2]);
 
     await (
-      await greeter
-        .connect(anotherSigner)
-        .setGreeting("Bonjour le monde!")
+      await greeter.connect(anotherSigner).setGreeting("Bonjour le monde!")
     ).wait();
     expect(await greeter.greet()).to.be.equal("Bonjour le monde!");
 
@@ -69,12 +73,17 @@ describe("Direct usage of Tenderly fork API ", function () {
 
     const forkingPoint = { network_id: "1", block_number: 14386016 };
     // create the specified fork
-    const forkResponse = await axiosOnTenderly.post(`${projectUrl}/fork`, forkingPoint);
+    const forkResponse = await axiosOnTenderly.post(
+      `${projectUrl}/fork`,
+      forkingPoint
+    );
     const forkId = forkResponse.data.root_transaction.fork_id;
 
     // create the provider you can use throughout the rest of your test
-    const provider = new JsonRpcProvider(`https://rpc.tenderly.co/fork/${forkId}`);
-    console.info("Forked with fork id:", forkId)
+    const provider = new JsonRpcProvider(
+      `https://rpc.tenderly.co/fork/${forkId}`
+    );
+    console.info("Forked with fork id:", forkId);
 
     // - deploy smart contract
     const Greeter = await ethers.getContractFactory(
@@ -96,18 +105,17 @@ describe("Direct usage of Tenderly fork API ", function () {
 
     expect(await greeter.greet()).to.be.equal("Hello, world!");
     // - sign transactions with a specific signer
-    const testAddresses = Object.keys(forkResponse.data.simulation_fork.accounts);
+    const testAddresses = Object.keys(
+      forkResponse.data.simulation_fork.accounts
+    );
     const anotherSigner = provider.getSigner(testAddresses[2]);
 
     await (
-      await greeter
-        .connect(anotherSigner)
-        .setGreeting("Bonjour le monde!")
+      await greeter.connect(anotherSigner).setGreeting("Bonjour le monde!")
     ).wait();
     expect(await greeter.greet()).to.be.equal("Bonjour le monde!");
 
     // - remove the fork each time test succeeds
     await axiosOnTenderly.delete(`${projectUrl}/fork/${forkId}`);
   });
-
 });
