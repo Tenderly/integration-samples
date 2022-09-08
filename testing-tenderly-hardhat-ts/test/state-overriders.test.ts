@@ -1,15 +1,15 @@
-import axios from "axios";
-import * as dotenv from "dotenv";
-import { ethers } from "hardhat";
-import ContractAbiFile from "../artifacts/contracts/FooStorage.sol/FooStorage.json";
-import { anAxiosOnTenderly } from "./utils/tenderly/fork";
+import axios from 'axios';
+import * as dotenv from 'dotenv';
+import { ethers } from 'hardhat';
+import ContractAbiFile from '../artifacts/contracts/FooStorage.sol/FooStorage.json';
+import { anAxiosOnTenderly } from './utils/tenderly/fork';
 dotenv.config();
 
 const contractAbi = ContractAbiFile.abi;
 
-// https://dashboard.tenderly.co/nenad/observer/contract/ropsten/0x85063cf82504381db12a2e42009a9ae2060098b5
-const VERIFIED_CONTRACT_ADDRESS = "0x85063cf82504381db12a2e42009a9ae2060098b5";
-const NETWORK_ID = "3";
+// https://dashboard.tenderly.co/contract/ropsten/0x3e96792068555146c16cc899186c767e48c30593
+const VERIFIED_CONTRACT_ADDRESS = '0x3e96792068555146c16cc899186c767e48c30593';
+const NETWORK_ID = '3';
 
 const { TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_KEY } = process.env;
 
@@ -24,15 +24,11 @@ type ContractsStatesOverride = {
   };
 };
 
-describe("State Overrides", async function () {
-  before(async () => {
-    // await forkAndDeployFooKvStorage();
-  });
-
-  it.skip("SSO of mappings from primitives are applied like so", async () => {
+describe('State Overrides', async function () {
+  it('overrides primitive fields using helper encode-state-overrides API', async () => {
     const axiosOptions = {
       headers: {
-        "X-Access-Key": TENDERLY_ACCESS_KEY || "",
+        'X-Access-Key': TENDERLY_ACCESS_KEY || '',
       },
     };
 
@@ -56,8 +52,8 @@ describe("State Overrides", async function () {
         [VERIFIED_CONTRACT_ADDRESS]: {
           value: {
             // overrides of contract state override (fields come from contract's state vars)
-            "kvStore[1]": "99",
-            nr: "1",
+            'kvStore[1]': '99',
+            nr: '1',
           },
         },
       },
@@ -82,7 +78,7 @@ describe("State Overrides", async function () {
       ...unsignedTransactionToSimulate, //
       input: unsignedTransactionToSimulate.data, // input is necessary
       network_id: `${NETWORK_ID}`, //network ID: a string
-      from: "0x0000000000000000000000000000000000000000", // any address
+      from: '0x0000000000000000000000000000000000000000', // any address
       to: VERIFIED_CONTRACT_ADDRESS,
 
       /* This is again a mapping; Map<ContractAddress, {storage: encodedStorageOverrides }> 
@@ -107,15 +103,15 @@ describe("State Overrides", async function () {
       axiosOptions
     );
     console.log(
-      "Returned value: ",
+      'Returned value: ',
       simResponse.data.transaction.transaction_info.call_trace.output
     );
   });
 
-  it("SSO_ADDR of mappings from address are applied like so", async () => {
+  it('overrides mapping fields using helper encode-state-overrides API', async () => {
     const axiosOptions = {
       headers: {
-        "X-Access-Key": TENDERLY_ACCESS_KEY || "",
+        'X-Access-Key': TENDERLY_ACCESS_KEY || '',
       },
     };
 
@@ -139,13 +135,12 @@ describe("State Overrides", async function () {
         [VERIFIED_CONTRACT_ADDRESS]: {
           value: {
             // overrides of contract state override (fields come from contract's state vars)
-            "addrMap[0x0ff132c3661dcbccdfed6f810c1d1c54e71715e0]": "99",
-            nr: "1",
+            'addrMap[0x0ff132c3661dcbccdfed6f810c1d1c54e71715e0]': '99',
+            nr: '1',
           },
         },
       },
     };
-    console.log(stateOverridesSpecification);
 
     // 2: Encode state overrides (intermediary step)
     const ENCODE_STATE_API = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/contracts/encode-states`;
@@ -159,16 +154,15 @@ describe("State Overrides", async function () {
     // 3: Prepare transaction
     const unsignedTransactionToSimulate =
       await deployedContract.populateTransaction.addrMap(
-        "0x0ff132c3661dcbccdfed6f810c1d1c54e71715e0"
+        '0x0ff132c3661dcbccdfed6f810c1d1c54e71715e0'
       );
-    console.log(unsignedTransactionToSimulate);
 
     // 4: Create a transaction and pass encodedStateOverrides under state_objects
     const transactionWithOverrides = {
       ...unsignedTransactionToSimulate, //
       input: unsignedTransactionToSimulate.data, // input is necessary
       network_id: `${NETWORK_ID}`, //network ID: a string
-      from: "0x0000000000000000000000000000000000000000", // any address
+      from: '0x0000000000000000000000000000000000000000', // any address
       to: VERIFIED_CONTRACT_ADDRESS,
 
       /* 
@@ -184,7 +178,6 @@ describe("State Overrides", async function () {
       },
       save: true, // saves to dashboard
     };
-    console.log(JSON.stringify(transactionWithOverrides));
 
     const SIMULATE_API = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/simulate`;
 
@@ -194,42 +187,48 @@ describe("State Overrides", async function () {
       axiosOptions
     );
     console.log(
-      "Returned value: ",
+      'Returned value: ',
       simResponse.data.transaction.transaction_info.call_trace.output
     );
   });
 
-  it.skip("OV_API", async () => {
+  it('using raw storge override values', async () => {
     anAxiosOnTenderly().post(
       `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/fork/${NETWORK_ID}/simulate`,
       {
-        network_id: "3",
+        network_id: '3',
         block_number: null,
         transaction_index: null,
-        from: "0x0000000000000000000000000000000000000000",
+        from: '0x0000000000000000000000000000000000000000',
         input:
-          "0x866d08f60000000000000000000000000000000000000000000000000000000000000001",
-        to: "0xdd8d20aaded200b27c2b2733d465c6392d0a8357",
+          '0x866d08f60000000000000000000000000000000000000000000000000000000000000001',
+        to: '0xdd8d20aaded200b27c2b2733d465c6392d0a8357',
         gas: 8000000,
-        gas_price: "0",
-        value: "0",
+        gas_price: '0',
+        value: '0',
         access_list: [],
         generate_access_list: true,
         save: true,
-        source: "dashboard",
+        source: 'dashboard',
         block_header: null,
         state_objects: {
-          "0xdd8d20aaded200b27c2b2733d465c6392d0a8357": {
+          // the contract address
+          '0xdd8d20aaded200b27c2b2733d465c6392d0a8357': {
             storage: {
-              "0xada5013122d395ba3c54772283fb069b10426056ef8ca54750cb9bb552a59e7d":
-                "0x0000000000000000000000000000000000000000000000000000000000000063",
+              //?
+              '0xada5013122d395ba3c54772283fb069b10426056ef8ca54750cb9bb552a59e7d':
+                //?
+                '0x0000000000000000000000000000000000000000000000000000000000000063',
             },
           },
         },
-        root: "ce17686c-5ec8-47f3-8bb3-ae9f46c3a5bf",
-        alias: "",
-        description: "",
+        root: 'ce17686c-5ec8-47f3-8bb3-ae9f46c3a5bf',
+        alias: '',
+        description: '',
       }
     );
+  });
+  it.skip('Single Simulation with State Overrides', async () => {
+    // TODO: how to construct the overrides without using the encode-state-overrides API?
   });
 });
