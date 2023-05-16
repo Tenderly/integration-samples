@@ -1,0 +1,3 @@
+[submodule "backend-infra-components/node-custom-rpc-methods/node-extensions-library"]
+	path = backend-infra-components/node-custom-rpc-methods/node-extensions-library
+	url = git@github.com:Tenderly/node-extensions-library.git
