@@ -1,0 +1,23 @@
+account_id: ""
+actions:
+  filiptenderly/test:
+    runtime: v2
+    sources: actions
+    specs:
+      event-pipeline-test:
+        description: |
+          Action listens to transactions that produce event with specified name on specified contract
+          Action sends transaction payload to specified webhook.
+        function: dispatcher:actionFn
+        trigger:
+          type: transaction
+          transaction:
+            filters:
+            - eventEmitted:
+                contract:
+                  address: 0x6B175474E89094C44Da98b954EedeAC495271d0F
+                name: Transfer
+              network: 1
+            status:
+            - MINED
+project_slug: ""
