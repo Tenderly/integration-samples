@@ -1,4 +1,4 @@
-name: Run tests in Tenderly Fork
+name:  Tenderly Fork
 
 on:
   push:
@@ -6,8 +6,7 @@ on:
   pull_request:
     branches: [ main ]
 jobs:
-  test:
-    name: Test hardhat-core on Ubuntu with Node ${{ matrix.node }}
+    name: hardhat-core on Ubuntu with Node ${{ matrix.node }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,7 +25,7 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Install
         run: yarn install
-      - name: Run tests
+      - name: build
         env:
           TENDERLY_FORK_ID: ${{ secrets.TENDERLY_FORK_ID }}
-        run: yarn test:ci
+        run: yarn build:ci
